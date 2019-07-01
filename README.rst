@@ -1,3 +1,4 @@
 Vote
 =============================================
-Provide user voting system
+Provide user voting system.
+Currently under heavy development.
