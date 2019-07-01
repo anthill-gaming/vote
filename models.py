@@ -11,12 +11,12 @@ from sqlalchemy.orm import validates
 from typing import Generator
 
 
-class VoteError(Exception):
+class VotingError(Exception):
     pass
 
 
-class Vote(db.Model):
-    __tablename__ = 'votes'
+class Voting(db.Model):
+    __tablename__ = 'votings'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
@@ -29,7 +29,7 @@ class Vote(db.Model):
     can_revote = db.Column(db.Boolean, default=True)
     select_count = db.Column(db.Integer, default=1)
 
-    memderships = db.relationship('VoteMembership', backref='vote', lazy='dynamic')
+    members = db.relationship('VotingMember', backref='voting', lazy='dynamic')
 
     @validates('finish_at')
     def validate_finish_at(self, key, value):
@@ -43,9 +43,9 @@ class Vote(db.Model):
 
     def result(self) -> Generator:
         if timezone.now() < self.start_at:
-            raise VoteError('Vote not started')
+            raise VotingError('Voting not started')
         if timezone.now() < self.finish_at:
-            raise VoteError('Vote not finished')
+            raise VotingError('Voting not finished')
         if self.anonymous:
             return (m.result for m in self.memderships)
         else:
@@ -53,18 +53,18 @@ class Vote(db.Model):
 
     @as_future
     def join(self, user_id: str) -> None:
-        m = VoteMembership(user_id=user_id, vote_id=self.id)
-        self.memderships.append(m)
+        m = VotingMember(user_id=user_id, voting_id=self.id)
+        self.members.append(m)
         db.session.add(m)
         db.session.commit()
 
 
-class VoteMembership(InternalAPIMixin, db.Model):
-    __tablename__ = 'vote_memberships'
+class VotingMember(InternalAPIMixin, db.Model):
+    __tablename__ = 'voting_members'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    vote_id = db.Column(db.Integer, db.ForeignKey('votes.id'), nullable=False)
+    voting_id = db.Column(db.Integer, db.ForeignKey('votings.id'), nullable=False)
     result = db.Column(ScalarListType(), nullable=False)
     created = db.Column(db.DateTime, default=timezone.now)
     updated = db.Column(db.DateTime, onupdate=timezone.now)
@@ -82,17 +82,17 @@ class VoteMembership(InternalAPIMixin, db.Model):
         return bool(self.result)
 
     @as_future
-    def do_vote(self, items: list) -> None:
-        if not self.vote.active:
-            raise VoteError('Vote not active')
+    def vote(self, items: list) -> None:
+        if not self.voting.active:
+            raise VotingError('Voting not active')
         if not self.enabled:
-            raise VoteError('Vote membership disabled')
-        if self.voted and not self.vote.can_revote:
-            raise VoteError('Already voted')
-        if len(items) != self.vote.select_count:
-            raise VoteError('Voted items count: %s/%s' % (len(items), self.vote.select_count))
-        if not set(items).issubset(self.vote.items):
-            raise VoteError('Voted items is %s. Must be a subset '
-                            'of %s' % (','.join(items), ','.join(self.vote.items)))
+            raise VotingError('Voting member disabled')
+        if self.voted and not self.voting.can_revote:
+            raise VotingError('Already voted')
+        if len(items) != self.voting.select_count:
+            raise VotingError('Voting items count: %s/%s' % (len(items), self.voting.select_count))
+        if not set(items).issubset(self.voting.items):
+            raise VotingError('Voting items is %s. Must be a subset '
+                              'of %s' % (','.join(items), ','.join(self.voting.items)))
         self.result = items
         self.save()
