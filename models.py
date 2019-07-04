@@ -97,13 +97,3 @@ class VotingMember(InternalAPIMixin, db.Model):
             self.delete()
         else:
             raise VotingError('Cannot discard')
-
-
-async def vote(user_id: str, voting_id: str, items: list) -> None:
-    m = VotingMember(user_id=user_id, voting_id=voting_id)
-    await m.vote(result=items)
-
-
-async def discard(user_id: str, voting_id: str) -> None:
-    m = VotingMember.query.filter_by(user_id=user_id, voting_id=voting_id).one()
-    await m.discard()
