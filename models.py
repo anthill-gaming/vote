@@ -8,6 +8,7 @@ from anthill.platform.auth import RemoteUser
 from sqlalchemy_utils.types import ScalarListType
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import validates
+from typing import Optional
 
 
 class VotingError(Exception):
@@ -44,8 +45,6 @@ class Voting(db.Model):
     def result(self) -> list:
         if timezone.now() < self.start_at:
             raise VotingError('Voting not started')
-        if timezone.now() < self.finish_at:
-            raise VotingError('Voting not finished')
         if self.anonymous:
             return [m.result for m in self.memderships]
         else:
@@ -75,7 +74,11 @@ class VotingMember(InternalAPIMixin, db.Model):
         return RemoteUser(**data)
 
     @as_future
-    def vote(self, items: list) -> None:
+    def vote(self, items: Optional[list] = None) -> None:
+        items = self.result or items
+        if not items:
+            raise VotingError('No items to vote')
+
         if not self.voting.active:
             raise VotingError('Voting not active')
         if not self.enabled:
@@ -87,6 +90,7 @@ class VotingMember(InternalAPIMixin, db.Model):
         if not set(items).issubset(self.voting.items):
             raise VotingError('Voting items is %s. Must be a subset '
                               'of %s' % (','.join(items), ','.join(self.voting.items)))
+
         self.result = items
         self.voted = True
         self.save()
