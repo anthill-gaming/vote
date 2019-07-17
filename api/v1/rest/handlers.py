@@ -3,7 +3,7 @@ from anthill.platform.api.rest.handlers.edit import (
     CreatingMixin, UpdatingMixin, DeletionMixin, ModelFormHandler)
 from anthill.platform.api.rest.handlers.list import ListHandler
 from vote.models import Voting, VotingMember
-from .forms import VotingMemberForm
+from vote.api.v1.rest.forms import VotingMemberForm
 
 
 class VotingHandler(CreatingMixin, UpdatingMixin, DeletionMixin, DetailMixin,
