@@ -6,7 +6,7 @@ from . import handlers
 route_patterns = [
     url(r'^/voting/(?P<id>[^/]+)/?$', handlers.VotingHandler, name='voting'),
     url(r'^/voting/?$', handlers.VotingHandler, name='voting_create'),
-    url(r'^/voting-list/?$', handlers.VotingsListHandler, name='voting_list'),
+    url(r'^/voting-list/?$', handlers.VotingListHandler, name='voting_list'),
     url(r'^/vote/?$', handlers.VoteHandler, name='vote'),
     url(r'^/discard/?$', handlers.DiscardHandler, name='discard'),
     url(r'^/result/?$', handlers.ResultHandler, name='result'),

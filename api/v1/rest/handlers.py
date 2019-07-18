@@ -27,7 +27,7 @@ class VotingHandler(CreatingMixin, UpdatingMixin, DeletionMixin, DetailMixin,
         return form_class
 
 
-class VotingsListHandler(ListHandler):
+class VotingListHandler(ListHandler):
     """Get list of voting items."""
     model = Voting
 
