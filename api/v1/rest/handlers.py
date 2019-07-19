@@ -39,7 +39,6 @@ class VoteHandler(CreatingMixin, ModelFormHandler):
         self.object.user_id = self.current_user.id
 
     async def form_valid(self, form):
-        """If the form is valid, save the associated model."""
         if self.object is None:
             model = self.get_model()
             # noinspection PyAttributeOutsideInit
