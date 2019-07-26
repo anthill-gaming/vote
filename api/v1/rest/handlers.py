@@ -8,20 +8,8 @@ from vote.api.v1.rest.forms import VotingMemberForm
 
 class VotingHandler(CreatingMixin, UpdatingMixin, DeletionMixin, DetailMixin,
                     ModelFormHandler):
-    """
-    Multiple operations with voting items:
-        fetching, creating, updating and deleting.
-    """
+    """Multiple operations with voting items."""
     model = Voting
-
-    def get_form_class(self):
-        """Return the form class to use in this handler."""
-        form_class = super().get_form_class()
-        if self.request.method in ('PUT',):  # Updating
-            # Patching form meta
-            setattr(form_class.Meta, 'all_fields_optional', True)
-            setattr(form_class.Meta, 'assign_required', False)
-        return form_class
 
 
 class VotingListHandler(ListHandler):
