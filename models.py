@@ -78,7 +78,6 @@ class VotingMember(InternalAPIMixin, db.Model):
         items = self.result or items
         if not items:
             raise VotingError('No items to vote')
-
         if not self.voting.active:
             raise VotingError('Voting not active')
         if not self.enabled:

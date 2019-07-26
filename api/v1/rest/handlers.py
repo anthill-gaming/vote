@@ -9,18 +9,18 @@ from vote.api.v1.rest.forms import VotingMemberForm
 class VotingHandler(CreatingMixin, UpdatingMixin, DeletionMixin, DetailMixin,
                     ModelFormHandler):
     """Multiple operations with voting items."""
-    model = Voting
+    queryset = Voting.query.filter_by(active=True)
 
 
 class VotingListHandler(ListHandler):
     """Get list of voting items."""
-    model = Voting
+    queryset = Voting.query.filter_by(active=True)
 
 
 class VoteHandler(CreatingMixin, ModelFormHandler):
     """Create VotingMember object."""
-    model = VotingMember
     form_class = VotingMemberForm
+    queryset = VotingMember.query.filter_by(enabled=True)
 
     def configure_object(self, form):
         super().configure_object(form)
@@ -37,7 +37,7 @@ class VoteHandler(CreatingMixin, ModelFormHandler):
 
 class DiscardHandler(ModelFormHandler):
     """Discard voting result."""
-    model = VotingMember
+    queryset = VotingMember.query.filter_by(enabled=True)
 
     async def delete(self, *args, **kwargs):
         # noinspection PyAttributeOutsideInit
@@ -53,7 +53,7 @@ class DiscardHandler(ModelFormHandler):
 
 class ResultHandler(ModelFormHandler):
     """Get voting result."""
-    model = Voting
+    queryset = Voting.query.filter_by(active=True)
 
     async def get(self, *args, **kwargs):
         # noinspection PyAttributeOutsideInit
