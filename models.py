@@ -42,6 +42,14 @@ class Voting(db.Model):
     def active(self) -> bool:
         return self.finish_at > timezone.now() >= self.start_at and self.enabled
 
+    @active.expression
+    def active(cls) -> bool:
+        return db.and_(
+            cls.finish_at > timezone.now(),
+            cls.start_at <= timezone.now(),
+            cls.enabled
+        )
+
     def result(self) -> list:
         if timezone.now() < self.start_at:
             raise VotingError('Voting not started')
