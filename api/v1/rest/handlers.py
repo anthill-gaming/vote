@@ -33,6 +33,7 @@ class VoteHandler(CreatingMixin, ModelFormHandler):
             self.object = model()
         self.configure_object(form)
         await self.object.vote()
+        self.write_json(data='OK')
 
 
 class DiscardHandler(ModelFormHandler):
