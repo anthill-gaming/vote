@@ -6,5 +6,4 @@ from vote.models import VotingMember
 class VotingMemberForm(ModelForm):
     class Meta:
         model = VotingMember
-        exclude = ['user_id']
-        include = ['voting_id']
+        include = ['voting_id', 'result', 'enabled']

@@ -71,8 +71,8 @@ class VotingMember(InternalAPIMixin, db.Model):
     result = db.Column(ScalarListType(), nullable=False)
     created = db.Column(db.DateTime, default=timezone.now)
     updated = db.Column(db.DateTime, onupdate=timezone.now)
-    enabled = db.Column(db.Boolean, default=True)
     voted = db.Column(db.Boolean, default=False)
+    enabled = db.Column(db.Boolean, default=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
