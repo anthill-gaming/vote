@@ -1,9 +1,9 @@
 # For more details, see
 # http://docs.sqlalchemy.org/en/latest/orm/tutorial.html#declare-a-mapping
-from anthill.framework.utils.asynchronous import as_future
 from anthill.framework.db import db
 from anthill.framework.utils import timezone
 from anthill.platform.api.internal import InternalAPIMixin
+from anthill.framework.utils.asynchronous import as_future
 from anthill.platform.auth import RemoteUser
 from sqlalchemy_utils.types import ScalarListType
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -73,9 +73,6 @@ class VotingMember(InternalAPIMixin, db.Model):
     updated = db.Column(db.DateTime, onupdate=timezone.now)
     voted = db.Column(db.Boolean, default=False)
     enabled = db.Column(db.Boolean, default=True)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     async def get_user(self) -> RemoteUser:
         data = await self.internal_request('login', 'get_user', user_id=self.user_id)
